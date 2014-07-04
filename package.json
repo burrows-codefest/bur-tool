@@ -1,0 +1,14 @@
+{
+  "name": "bur-tool",
+  "version": "0.0.1",
+  "description": "An inline burrows build tool",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jasonjeffrey/bur-tool.git"
+  },
+  "author": "Burrows",
+  "bugs": {
+    "url": "https://github.com/jasonjeffrey/bur-tool/issues"
+  },
+  "homepage": "https://github.com/jasonjeffrey/bur-tool"
+}
