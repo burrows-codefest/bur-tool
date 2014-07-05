@@ -10,9 +10,11 @@ if (commands.length === 0 || commands[0] === '-h') {
 }
 
 //compare params to lib files
-fs.exists('libs/'+ commands[0] + '.js', function (exists) {
+fs.exists(__dirname + 'libs/'+ commands[0] + '.js', function (exists) {
+    var command;
     if(exists) {
-        //call existing function
+        command = require(__dirname + 'libs/'+ commands[0] + '.js');
+        command.execute();
     } else {
         help.execute();
     }
