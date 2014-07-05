@@ -1,6 +1,6 @@
 {
   "name": "bur-tool",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "An inline burrows build tool",
   "bin": {
     "bur": "./bur"
