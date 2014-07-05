@@ -2,7 +2,9 @@
   "name": "bur-tool",
   "version": "0.0.1",
   "description": "An inline burrows build tool",
-  "bin": {"bur": "./bur"},
+  "bin": {
+    "bur": "./bur"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/jasonjeffrey/bur-tool.git"
@@ -11,5 +13,11 @@
   "bugs": {
     "url": "https://github.com/jasonjeffrey/bur-tool/issues"
   },
-  "homepage": "https://github.com/jasonjeffrey/bur-tool"
+  "homepage": "https://github.com/jasonjeffrey/bur-tool",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-contrib-jshint": "~0.10.0",
+    "time-grunt": "~0.3.2",
+    "load-grunt-config": "~0.10.0"
+  }
 }

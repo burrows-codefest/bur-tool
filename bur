@@ -1,3 +1,21 @@
 #!/usr/bin/env node
 
-console.log('hello world');
+var fs = require('fs'),
+    help = require('./libs/help'),
+    commands = process.argv.slice(2);
+
+//check to see if any params are set
+if (commands.length === 0 || commands[0] === '-h') {
+    help.execute();
+}
+
+console.log(__dirname);
+
+//compare params to lib files
+fs.exists('libs/'+ commands[0] + '.js', function (exists) {
+    if(exists) {
+        //call existing function
+    } else {
+        help.execute();
+    }
+});
