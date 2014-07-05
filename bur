@@ -9,8 +9,6 @@ if (commands.length === 0 || commands[0] === '-h') {
     help.execute();
 }
 
-console.log(__dirname);
-
 //compare params to lib files
 fs.exists('libs/'+ commands[0] + '.js', function (exists) {
     if(exists) {
