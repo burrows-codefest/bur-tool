@@ -37,13 +37,12 @@ exports.execute = function () {
 
         githubResponse.on('end', function () {
            console.log(data);
+            //compare master branch sha to stored value
+            //if no match download latest version
+            //now push hooks to current project
+            //update config.json
         });
     })
-
-    //add them to git hooks folder
-
-    //add project to the config.json
-
 }
 
 exports.help = function () {
