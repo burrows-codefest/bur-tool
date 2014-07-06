@@ -1,22 +1,44 @@
 'use strict';
 
-var fs = require('fs');
+var fs = require('fs'),
+    https = require('https'),
+    githubApiUrl = 'api.github.com',
+    gitApiHttpsOptions = {
+        'hostname': githubApiUrl,
+        'headers': {
+            'user-agent': 'bur-tool'
+        }
+    };
 
 exports.execute = function () {
     var installedProjects = fs.readFileSync(__dirname + '/../config.json').projects,
         currentProject = process.cwd();
 
-    if(installedProjects.indexOf(currentProject) !== -1) {
+    if(installedProjects && installedProjects.indexOf(currentProject) !== -1) {
         console.log('ERROR: Project already has githooks installed. use bur update to get the latest version');
         process.exit(1);
     }
 
-    if(fs.existsSync(currentProject + '/.git')) {
+    if(!fs.existsSync(currentProject + '/.git')) {
         console.log('ERROR: GIT folder does not exist in this project');
         process.exit(1);
     }
 
-    //get hooks from github
+    console.log('checking the latest version of git hooks');
+
+    gitApiHttpsOptions.path = '/repos/burrows-codefest/git-hooks/branches';
+
+    https.get(gitApiHttpsOptions, function (githubResponse) {
+        var data = '';
+
+        githubResponse.on('data', function (chunk) {
+            data += chunk;
+        });
+
+        githubResponse.on('end', function () {
+           console.log(data);
+        });
+    })
 
     //add them to git hooks folder
 
