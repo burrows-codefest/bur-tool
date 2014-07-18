@@ -1,21 +1,11 @@
 'use strict';
 
 var fs = require('fs'),
-    https = require('https'),
-    ncp = require('ncp').ncp,
-    exec = require('child_process').exec,
     supportUtils = require('./support/utils'),
-    githubApiUrl = 'api.github.com',
-    gitApiHttpsOptions = {
-        'hostname': githubApiUrl,
-        'headers': {
-            'user-agent': 'bur-tool'
-        }
-    };
+    gitHooksUtils = require('./githooks/utils');
 
 exports.execute = function () {
-    var githubProjectData,
-        cachePath = __dirname + '/../cache',
+    var cachePath = __dirname + '/../cache',
         githooksPath = cachePath + '/githooks',
         config = supportUtils.getConfig(),
         installedProjects = config.projects,
@@ -34,86 +24,43 @@ exports.execute = function () {
 
     console.log('checking the latest version of git hooks');
 
-    gitApiHttpsOptions.path = '/repos/burrows-codefest/git-hooks/branches';
-
-    https.get(gitApiHttpsOptions, function (githubResponse) {
-        var data = '';
-
-        githubResponse.on('data', function (chunk) {
-            data += chunk;
-        });
-
-        githubResponse.on('end', function () {
-            data = JSON.parse(data);
-            githubProjectData = data.filter(function (item) {
-                return item.name === 'master';
-            })[0];
-
-            if (!githooksCacheVersion) {
-                if (!fs.existsSync(cachePath)) {
-                    fs.mkdirSync(cachePath);
-                }
-
-                if (!fs.existsSync(githooksPath)) {
-                    fs.mkdirSync(githooksPath);
-                }
-
-                exec('git clone -b master https://github.com/burrows-codefest/git-hooks.git ' + githooksPath,
-                    function (error) {
-                        if (error) {
-                            console.log('ERROR: GIT Clone failed - ' + error);
-                            process.exit(1);
-                        }
-
-                        if (!fs.existsSync(currentProject + '/.git/hooks')) {
-                            fs.mkdirSync(currentProject + '/.git/hooks');
-                        }
-
-                        ncp(githooksPath + '/node', currentProject + '/.git/hooks', function (err) {
-                            if (err) {
-                                console.log('ERROR: File Copy failed - ' + err);
-                                process.exit(1);
-                            }
-
-                            config.cache.githooks = githubProjectData.commit.sha;
-                            config.projects[currentProject] = githubProjectData.commit.sha;
-
-                            supportUtils.setConfig(config);
-
-                            console.log('git hooks added to this project');
-                        });
-                    });
-
-            } else if (githooksCacheVersion !== githubProjectData.commit.sha) {
-                exec('git pull origin master',
-                    function (error) {
-                        if (error) {
-                            console.log('ERROR: GIT Clone failed - ' + error);
-                            process.exit(1);
-                        }
-
-                        ncp(githooksPath + '/node', currentProject + '/.git/hooks', function (err) {
-                            if (err) {
-                                console.log('ERROR: File Copy failed - ' + err);
-                                process.exit(1);
-                            }
-
-                            config.cache.githooks = githubProjectData.commit.sha;
-                            config.projects[currentProject] = githubProjectData.commit.sha;
-
-                            supportUtils.setConfig(config);
-
-                            console.log('git hooks updated for this project');
-                        });
-                    });
-            } else {
-                console.log('This Project currently has the latest version of git hooks');
-                process.exit(0);
+    gitHooksUtils.getGitHookMasterBranchStatus(function (githubStatus) {
+        if (!githooksCacheVersion) {
+            if (!fs.existsSync(cachePath)) {
+                fs.mkdirSync(cachePath);
             }
-        });
+
+            if (!fs.existsSync(githooksPath)) {
+                fs.mkdirSync(githooksPath);
+            }
+
+            gitHooksUtils.cloneGithooksRepo(function () {
+                gitHooksUtils.copyFilesFromCacheToProject(function () {
+                    config.cache.githooks = githubStatus.commit.sha;
+                    config.projects[currentProject] = githubStatus.commit.sha;
+
+                    supportUtils.setConfig(config);
+
+                    console.log('git hooks added to this project');
+                });
+            });
+
+        } else if (githooksCacheVersion !== githubStatus.commit.sha) {
+            gitHooksUtils.pullLatestGithooksRepoVersion(function () {
+                gitHooksUtils.copyFilesFromCacheToProject(function () {
+                    config.cache.githooks = githubStatus.commit.sha;
+                    config.projects[currentProject] = githubStatus.commit.sha;
+
+                    supportUtils.setConfig(config);
+
+                    console.log('git hooks updated for this project');
+                });
+            });
+        } else {
+            console.log('This Project currently has the latest version of git hooks');
+            process.exit(0);
+        }
     });
-
-
 };
 
 exports.help = function () {
