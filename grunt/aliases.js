@@ -1,5 +1,5 @@
 module.exports = function () {
     return {
-        default: ['jshint']
+        default: ['jshint:all', 'mocha-chai-sinon:unit']
     }
 };

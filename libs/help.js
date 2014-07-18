@@ -3,7 +3,6 @@
 var fs = require('fs');
 
 exports.execute = function () {
-    // for each file on libs call the help function within them
     fs.readdir(__dirname, function (err, files) {
         if (err) {
             console.log(err);
@@ -23,8 +22,8 @@ exports.execute = function () {
 
         process.exit(0);
     });
-}
+};
 
 exports.help = function () {
-    console.log("help - shows all available commands");
-}
+    console.log('help - shows all available commands');
+};
