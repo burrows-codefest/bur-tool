@@ -21,7 +21,7 @@ exports.execute = function () {
         githooksCacheVersion = config.cache.githooks,
         currentProject = process.cwd();
 
-    if(installedProjects && installedProjects.indexOf(currentProject) !== -1) {
+    if(installedProjects && Object.keys(installedProjects).indexOf(currentProject) !== -1) {
         console.log('ERROR: Project already has githooks installed. use bur update to get the latest version');
         process.exit(1);
     }
@@ -68,7 +68,7 @@ exports.execute = function () {
                         fs.mkdirSync(currentProject + '/.git/hooks');
                     }
 
-                    ncp(githooksPath + '/hooks', currentProject + '/.git/hooks', function (err) {
+                    ncp(githooksPath + '/node', currentProject + '/.git/hooks', function (err) {
                         if (err) {
                             console.log('ERROR: File Copy failed - ' + err);
                             process.exit(1);
@@ -76,12 +76,35 @@ exports.execute = function () {
 
                         config.cache.githooks = githubProjectData.commit.sha;
                         config.projects[currentProject] = githubProjectData.commit.sha;
-                        console.log('git hooks updated for this project');
+
+                        fs.writeFileSync(__dirname + '/../config.json', JSON.stringify(config));
+
+                        console.log('git hooks added to this project');
                     });
                 });
 
             } else if (githooksCacheVersion !== githubProjectData.commit.sha) {
-                //git pull project
+                exec('git pull origin master',
+                    function (error) {
+                        if (error) {
+                            console.log('ERROR: GIT Clone failed - ' + error);
+                            process.exit(1);
+                        }
+
+                        ncp(githooksPath + '/node', currentProject + '/.git/hooks', function (err) {
+                            if (err) {
+                                console.log('ERROR: File Copy failed - ' + err);
+                                process.exit(1);
+                            }
+
+                            config.cache.githooks = githubProjectData.commit.sha;
+                            config.projects[currentProject] = githubProjectData.commit.sha;
+
+                            fs.writeFileSync(__dirname + '/../config.json', JSON.stringify(config));
+
+                            console.log('git hooks updated for this project');
+                        });
+                    });
             } else {
                 console.log('This Project currently has the latest version of git hooks');
                 process.exit(0);
@@ -89,10 +112,9 @@ exports.execute = function () {
         });
     });
 
-    //add project to the config.json
 
-}
+};
 
 exports.help = function () {
     console.log("githooks - adds customised git hooks to the current project");
-}
+};
