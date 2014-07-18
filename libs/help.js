@@ -13,9 +13,14 @@ exports.execute = function () {
             'add any of the following after the bur command to run:\n');
 
         files.forEach(function (file) {
-            var command = require(__dirname + '/' + file);
+           var  fileStat = fs.statSync(__dirname + '/' + file);
+            if (fileStat.isFile()) {
+                var command = require(__dirname + '/' + file);
 
-            command.help();
+                if (command.help) {
+                    command.help();
+                }
+            }
         });
 
         console.log('');
