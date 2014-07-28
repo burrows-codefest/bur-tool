@@ -1,0 +1,30 @@
+# gitignore file for
+
+#GIT
+.orig
+
+# Mac OS
+.DS_Store
+*.swp
+*.lock
+profile
+
+# Webstorm
+.idea/
+
+# Sass
+.sass-cache/
+
+# Bower
+app/components
+
+# Yeoman
+dist
+.tmp
+
+# Node
+node_modules
+
+#cache Folder
+cache/
+
