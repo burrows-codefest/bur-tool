@@ -8,14 +8,8 @@ exports.execute = function () {
     var cachePath = __dirname + '/../cache',
         githooksPath = cachePath + '/githooks',
         config = supportUtils.getConfig(),
-        installedProjects = config.projects,
         githooksCacheVersion = config.cache.githooks,
         currentProject = process.cwd();
-
-    if (installedProjects && Object.keys(installedProjects).indexOf(currentProject) !== -1) {
-        console.log('ERROR: Project already has githooks installed. use bur update to get the latest version');
-        process.exit(1);
-    }
 
     if (!fs.existsSync(currentProject + '/.git')) {
         console.log('ERROR: GIT folder does not exist in this project');

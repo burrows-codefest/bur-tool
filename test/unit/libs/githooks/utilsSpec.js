@@ -98,4 +98,35 @@ describe('githooks Utils helper', function () {
             expect(processExitSpy.args[0][0]).to.equal(1);
         });
     });
+
+    describe('pullLatestGithooksRepoVersion function', function () {
+        it('should run git pull and successfully pull the latest repo', function () {
+            var mockExec = function (command, callback) {
+                    callback(null);
+                },
+                callbackSpy = sinon.spy();
+
+            helper.__set__('exec', mockExec);
+
+            helper.cloneGithooksRepo(callbackSpy);
+
+            expect(callbackSpy.calledOnce).to.be.ok;
+        });
+
+        it('should run git pull and fails to pull the repo', function (done) {
+            var mockExec = function (command, callback) {
+                    callback({});
+                },
+                processExitSpy = sinon.spy(done()),
+                callbackSpy = sinon.spy();
+
+            helper.__set__('exec', mockExec);
+            helper.__set__('process.exit', processExitSpy);
+
+            helper.cloneGithooksRepo(callbackSpy);
+
+            expect(processExitSpy.calledOnce).to.be.ok;
+            expect(processExitSpy.args[0][0]).to.equal(1);
+        });
+    });
 });

@@ -63,7 +63,9 @@ exports.copyFilesFromCacheToProject = function (callback) {
 };
 
 exports.pullLatestGithooksRepoVersion = function (callback) {
-    exec('git pull origin master', function (error) {
+    var gitDirectory = githooksPath + '/.git';
+
+    exec('git --git-dir=' + gitDirectory + ' --work-tree=' + githooksPath + ' pull origin master', function (error) {
         if (error) {
             console.log('ERROR: GIT Clone failed - ' + error);
             process.exit(1);
