@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 var fs = require('fs'),
     help = require('./libs/help'),
     commands = process.argv.slice(2);

@@ -1,50 +1,62 @@
 'use strict';
 
 var fs = require('fs'),
-    https = require('https'),
-    githubApiUrl = 'api.github.com',
-    gitApiHttpsOptions = {
-        'hostname': githubApiUrl,
-        'headers': {
-            'user-agent': 'bur-tool'
-        }
-    };
+    supportUtils = require('./support/utils'),
+    gitHooksUtils = require('./githooks/utils');
 
 exports.execute = function () {
-    var installedProjects = fs.readFileSync(__dirname + '/../config.json').projects,
+    var cachePath = __dirname + '/../cache',
+        githooksPath = cachePath + '/githooks',
+        config = supportUtils.getConfig(),
+        githooksCacheVersion = config.cache.githooks,
         currentProject = process.cwd();
 
-    if(installedProjects && installedProjects.indexOf(currentProject) !== -1) {
-        console.log('ERROR: Project already has githooks installed. use bur update to get the latest version');
-        process.exit(1);
-    }
-
-    if(!fs.existsSync(currentProject + '/.git')) {
+    if (!fs.existsSync(currentProject + '/.git')) {
         console.log('ERROR: GIT folder does not exist in this project');
         process.exit(1);
     }
 
     console.log('checking the latest version of git hooks');
 
-    gitApiHttpsOptions.path = '/repos/burrows-codefest/git-hooks/branches';
+    gitHooksUtils.getGitHookMasterBranchStatus(function (githubStatus) {
+        if (!githooksCacheVersion) {
+            if (!fs.existsSync(cachePath)) {
+                fs.mkdirSync(cachePath);
+            }
 
-    https.get(gitApiHttpsOptions, function (githubResponse) {
-        var data = '';
+            if (!fs.existsSync(githooksPath)) {
+                fs.mkdirSync(githooksPath);
+            }
 
-        githubResponse.on('data', function (chunk) {
-            data += chunk;
-        });
+            gitHooksUtils.cloneGithooksRepo(function () {
+                gitHooksUtils.copyFilesFromCacheToProject(function () {
+                    config.cache.githooks = githubStatus.commit.sha;
+                    config.projects[currentProject] = githubStatus.commit.sha;
 
-        githubResponse.on('end', function () {
-           console.log(data);
-            //compare master branch sha to stored value
-            //if no match download latest version
-            //now push hooks to current project
-            //update config.json
-        });
-    })
-}
+                    supportUtils.setConfig(config);
+
+                    console.log('git hooks added to this project');
+                });
+            });
+
+        } else if (githooksCacheVersion !== githubStatus.commit.sha) {
+            gitHooksUtils.pullLatestGithooksRepoVersion(function () {
+                gitHooksUtils.copyFilesFromCacheToProject(function () {
+                    config.cache.githooks = githubStatus.commit.sha;
+                    config.projects[currentProject] = githubStatus.commit.sha;
+
+                    supportUtils.setConfig(config);
+
+                    console.log('git hooks updated for this project');
+                });
+            });
+        } else {
+            console.log('This Project currently has the latest version of git hooks');
+            process.exit(0);
+        }
+    });
+};
 
 exports.help = function () {
-    console.log("githooks - adds customised git hooks to the current project");
-}
+    console.log('githooks - adds customised git hooks to the current project');
+};
