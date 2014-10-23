@@ -52,7 +52,7 @@ exports.cloneGithooksRepo = function (callback) {
 };
 
 exports.copyFilesFromCacheToProject = function (callback) {
-    ncp(githooksPath + '/node', currentProject + '/.git/hooks', function (err) {
+    ncp(githooksPath + '/hooks', currentProject + '/.git/hooks', function (err) {
         if (err) {
             console.log('ERROR: File Copy failed - ' + err);
             process.exit(1);
