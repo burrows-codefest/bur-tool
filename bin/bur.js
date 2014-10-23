@@ -11,6 +11,6 @@ program.version(pkgJson.version);
 program
     .command('githooks')
     .description('adds customised git hooks to the current project')
-    .action(gitHooks.execute());
+    .action(gitHooks.execute);
 
 program.parse(process.argv);
