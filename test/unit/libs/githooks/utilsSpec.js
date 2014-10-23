@@ -55,6 +55,8 @@ describe('githooks Utils helper', function () {
             var mockExec = function (command, callback) {
                     callback({});
                 },
+                realExec = helper.__get__('exec'),
+                realExit = helper.__get__('process.exit'),
                 processExitSpy = sinon.spy(done()),
                 callbackSpy = sinon.spy();
 
@@ -65,6 +67,9 @@ describe('githooks Utils helper', function () {
 
             expect(processExitSpy.calledOnce).to.be.ok;
             expect(processExitSpy.args[0][0]).to.equal(1);
+
+            helper.__set__('exec', realExec);
+            helper.__set__('process.exit', realExit);
         });
     });
 
@@ -86,6 +91,8 @@ describe('githooks Utils helper', function () {
             var mockNcp = function (src, dest, callback) {
                     callback({});
                 },
+                realExec = helper.__get__('exec'),
+                realExit = helper.__get__('process.exit'),
                 processExitSpy = sinon.spy(done()),
                 callbackSpy = sinon.spy();
 
@@ -96,6 +103,9 @@ describe('githooks Utils helper', function () {
 
             expect(processExitSpy.calledOnce).to.be.ok;
             expect(processExitSpy.args[0][0]).to.equal(1);
+
+            helper.__set__('exec', realExec);
+            helper.__set__('process.exit', realExit);
         });
     });
 
@@ -117,6 +127,8 @@ describe('githooks Utils helper', function () {
             var mockExec = function (command, callback) {
                     callback({});
                 },
+                realExec = helper.__get__('exec'),
+                realExit = helper.__get__('process.exit'),
                 processExitSpy = sinon.spy(done()),
                 callbackSpy = sinon.spy();
 
@@ -127,6 +139,9 @@ describe('githooks Utils helper', function () {
 
             expect(processExitSpy.calledOnce).to.be.ok;
             expect(processExitSpy.args[0][0]).to.equal(1);
+
+            helper.__set__('exec', realExec);
+            helper.__set__('process.exit', realExit);
         });
     });
 });
