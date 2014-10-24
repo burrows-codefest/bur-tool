@@ -28,3 +28,5 @@ node_modules
 #cache Folder
 cache/
 
+#coverage file
+coverage.html
